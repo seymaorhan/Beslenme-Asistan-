@@ -1,0 +1,12 @@
+node_modules/
+.expo/
+dist/
+.env
+.env.local
+*.log
+.DS_Store
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+.claude/settings.local.json

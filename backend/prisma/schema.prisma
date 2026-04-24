@@ -1,0 +1,70 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String         @id @default(cuid())
+  name          String
+  email         String         @unique
+  password      String
+  createdAt     DateTime       @default(now())
+  favorites     Favorite[]
+  shoppingItems ShoppingItem[]
+  weeklyPlans   WeeklyPlan[]
+}
+
+model Recipe {
+  id          String       @id @default(cuid())
+  name        String
+  category    String
+  tag         String?
+  calories    Int
+  time        String
+  difficulty  String
+  emoji       String       @default("🍽️")
+  ingredients String       @db.NVarChar(Max)
+  steps       String       @db.NVarChar(Max)
+  imageUrl    String?
+  createdAt   DateTime     @default(now())
+  favorites   Favorite[]
+  weeklyPlans WeeklyPlan[]
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  recipeId  String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recipe    Recipe   @relation(fields: [recipeId], references: [id], onDelete: NoAction)
+
+  @@unique([userId, recipeId])
+}
+
+model ShoppingItem {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  category  String   @default("Diğer")
+  checked   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model WeeklyPlan {
+  id        String   @id @default(cuid())
+  userId    String
+  day       String
+  mealType  String
+  recipeId  String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recipe    Recipe   @relation(fields: [recipeId], references: [id], onDelete: NoAction)
+
+  @@unique([userId, day, mealType])
+}
