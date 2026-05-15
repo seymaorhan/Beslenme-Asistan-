@@ -9,6 +9,7 @@ export type Recipe = {
   time: string;
   difficulty: string;
   emoji: string;
+  imageUrl?: string;
   ingredients: string[];
   steps: string[];
 };

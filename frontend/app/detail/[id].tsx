@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  ActivityIndicator, Alert, Modal, Animated, Pressable,
+  ActivityIndicator, Alert, Modal, Animated, Pressable, Image,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -104,14 +104,22 @@ export default function DetailScreen() {
 
       {/* Hero */}
       <View style={styles.hero}>
+        {recipe.imageUrl ? (
+          <Image source={{ uri: recipe.imageUrl }} style={StyleSheet.absoluteFillObject} resizeMode="cover" />
+        ) : (
+          <>
+            <LinearGradient colors={[C.primaryLight, "#C8E6C9"]} style={StyleSheet.absoluteFillObject} />
+            <Text style={styles.heroEmoji}>{recipe.emoji}</Text>
+          </>
+        )}
         <LinearGradient
-          colors={[C.primaryLight, "#C8E6C9"]}
+          colors={["rgba(0,0,0,0.38)", "transparent", "rgba(0,0,0,0.55)"]}
+          locations={[0, 0.45, 1]}
           style={StyleSheet.absoluteFillObject}
         />
-        <Text style={styles.heroEmoji}>{recipe.emoji}</Text>
         <View style={styles.heroOverlay}>
           <TouchableOpacity style={styles.overlayBtn} onPress={() => router.back()} activeOpacity={0.8}>
-            <Ionicons name="chevron-back" size={22} color={C.text} />
+            <Ionicons name="chevron-back" size={22} color="#fff" />
           </TouchableOpacity>
           <Pressable
             onPress={handleToggleFav}
@@ -121,42 +129,44 @@ export default function DetailScreen() {
               <Ionicons
                 name={isFav ? "heart" : "heart-outline"}
                 size={22}
-                color={isFav ? "#E53935" : C.text}
+                color={isFav ? "#FF4444" : "#fff"}
               />
             </Animated.View>
           </Pressable>
         </View>
+        {/* Recipe name on hero */}
+        <View style={styles.heroTitleBox}>
+          <View style={styles.heroCatPill}>
+            <Text style={styles.heroCatText}>{recipe.category}</Text>
+          </View>
+          <Text style={styles.heroTitle}>{recipe.name}</Text>
+        </View>
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Title */}
+        {/* Meta Strip */}
         <View style={styles.titleBlock}>
-          <View style={styles.pillRow}>
-            <View style={styles.catPill}>
-              <Text style={styles.catPillText}>{recipe.category}</Text>
-            </View>
-            {recipe.tag && (
+          {recipe.tag && (
+            <View style={styles.pillRow}>
               <View style={[styles.catPill, { backgroundColor: C.accentLight }]}>
                 <Text style={[styles.catPillText, { color: C.accent }]}>{recipe.tag}</Text>
               </View>
-            )}
-          </View>
-          <Text style={styles.recipeName}>{recipe.name}</Text>
-
+            </View>
+          )}
           <View style={styles.metaStrip}>
             <View style={styles.metaItem}>
-              <Ionicons name="flame" size={20} color={C.accent} />
+              <Ionicons name="flame" size={22} color={C.accent} />
               <Text style={styles.metaValue}>{recipe.calories}</Text>
               <Text style={styles.metaLabel}>kal</Text>
             </View>
             <View style={styles.metaDivider} />
             <View style={styles.metaItem}>
-              <Ionicons name="time-outline" size={20} color={C.primary} />
+              <Ionicons name="time-outline" size={22} color={C.primary} />
               <Text style={styles.metaValue}>{recipe.time}</Text>
             </View>
             <View style={styles.metaDivider} />
             <View style={styles.metaItem}>
-              <Ionicons name="stats-chart-outline" size={20} color={C.muted} />
+              <Ionicons name="stats-chart-outline" size={22} color={C.muted} />
               <Text style={styles.metaValue}>{recipe.difficulty}</Text>
             </View>
           </View>
@@ -287,15 +297,18 @@ const styles = StyleSheet.create({
   errorBtnText: { color: C.primary, fontWeight: "700" },
 
   container: { flex: 1, backgroundColor: C.background },
-  hero: { height: 290, alignItems: "center", justifyContent: "center", overflow: "hidden" },
-  heroEmoji: { fontSize: 110 },
+  hero: { height: 310, overflow: "hidden", justifyContent: "flex-end" },
+  heroEmoji: { fontSize: 110, position: "absolute", alignSelf: "center", top: 80 },
   heroOverlay: { position: "absolute", top: 52, left: 18, right: 18, flexDirection: "row", justifyContent: "space-between" },
   overlayBtn: {
     width: 44, height: 44, borderRadius: 14,
-    backgroundColor: "rgba(255,255,255,0.92)",
+    backgroundColor: "rgba(0,0,0,0.35)",
     alignItems: "center", justifyContent: "center",
-    ...theme.shadow.sm,
   },
+  heroTitleBox: { paddingHorizontal: 20, paddingBottom: 20 },
+  heroCatPill: { backgroundColor: "rgba(255,255,255,0.22)", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4, alignSelf: "flex-start", marginBottom: 8 },
+  heroCatText: { color: "#fff", fontSize: 11, fontWeight: "700", letterSpacing: 0.5, textTransform: "uppercase" },
+  heroTitle: { fontSize: 26, fontWeight: "800", color: "#fff", letterSpacing: -0.3, lineHeight: 32 },
 
   content: { flex: 1 },
   titleBlock: {
